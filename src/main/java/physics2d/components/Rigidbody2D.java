@@ -16,6 +16,7 @@ public class Rigidbody2D  extends Component {
     private boolean continuousCollision = true;
 
     private Body rawBody = null;
+    private transient boolean isPlaying = false;
 
     @Override
     public void update(float dt) {
@@ -89,5 +90,9 @@ public class Rigidbody2D  extends Component {
 
     public void setRawBody(Body rawBody) {
         this.rawBody = rawBody;
+    }
+
+    public void setIsPlaying(boolean val) {
+        this.isPlaying = val;
     }
 }

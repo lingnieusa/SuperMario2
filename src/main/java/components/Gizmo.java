@@ -6,7 +6,6 @@ import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DELETE;
 
 public class Gizmo extends Component {
     private Vector4f xAxisColor = new Vector4f(1, 0.3f, 0.3f, 1);
@@ -20,11 +19,11 @@ public class Gizmo extends Component {
     private SpriteRenderer yAxisSprite;
     protected GameObject activeGameObject = null;
 
-    private Vector2f xAxisOffset = new Vector2f(24f/80f, -6f/80f);
-    private Vector2f yAxisOffset = new Vector2f(-7f/80f, 21f/80f);
+    private Vector2f xAxisOffset = new Vector2f(24f / 80f, -6f / 80f);
+    private Vector2f yAxisOffset = new Vector2f(-7f / 80f, 21f / 80f);
 
-    private float gizmoWidth = 16f/80f;
-    private float gizmoHeight = 48f/80f;
+    private float gizmoWidth = 16f / 80f;
+    private float gizmoHeight = 48f / 80f;
 
     protected boolean xAxisActive = false;
     protected boolean yAxisActive = false;
@@ -56,12 +55,16 @@ public class Gizmo extends Component {
         this.xAxisObject.setNoSerialize();
         this.yAxisObject.setNoSerialize();
     }
+
     @Override
     public void update(float dt) {
-        if (using){
+        if (using) {
             this.setInactive();
         }
+        this.xAxisObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(0, 0, 0, 0));
+        this.yAxisObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(0, 0, 0, 0));
     }
+
     @Override
     public void editorUpdate(float dt) {
         if (!using) return;
@@ -78,7 +81,7 @@ public class Gizmo extends Component {
                 newObj.transform.position.add(0.1f, 0.1f);
                 this.propertiesWindow.setActiveGameObject(newObj);
                 return;
-            } else if (KeyListener.keyBeginPress(GLFW_KEY_BACKSPACE)) {
+            } else if (KeyListener.keyBeginPress(GLFW_KEY_DELETE)) {
                 activeGameObject.destroy();
                 this.setInactive();
                 this.propertiesWindow.setActiveGameObject(null);
@@ -123,7 +126,7 @@ public class Gizmo extends Component {
     }
 
     private boolean checkXHoverState() {
-        Vector2f mousePos = MouseListener.getWorld();
+        Vector2f mousePos = new Vector2f(MouseListener.getWorldX(), MouseListener.getWorldY());
         if (mousePos.x <= xAxisObject.transform.position.x + (gizmoHeight / 2.0f) &&
                 mousePos.x >= xAxisObject.transform.position.x - (gizmoWidth / 2.0f) &&
                 mousePos.y >= xAxisObject.transform.position.y - (gizmoHeight / 2.0f) &&
@@ -137,8 +140,7 @@ public class Gizmo extends Component {
     }
 
     private boolean checkYHoverState() {
-        Vector2f mousePos = MouseListener.getWorld();
-
+        Vector2f mousePos = new Vector2f(MouseListener.getWorldX(), MouseListener.getWorldY());
         if (mousePos.x <= yAxisObject.transform.position.x + (gizmoWidth / 2.0f) &&
                 mousePos.x >= yAxisObject.transform.position.x - (gizmoWidth / 2.0f) &&
                 mousePos.y <= yAxisObject.transform.position.y + (gizmoHeight / 2.0f) &&

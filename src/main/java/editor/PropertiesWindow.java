@@ -25,7 +25,7 @@ public class PropertiesWindow {
     public void update(float dt, Scene currentScene) {
         debounce -= dt;
 
-        if (!MouseListener.isDragging()&& MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && debounce < 0) {
+        if (!MouseListener.isDragging() && MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && debounce < 0) {
             int x = (int)MouseListener.getScreenX();
             int y = (int)MouseListener.getScreenY();
             int gameObjectId = pickingTexture.readPixel(x, y);
@@ -49,21 +49,24 @@ public class PropertiesWindow {
                         activeGameObject.addComponent(new Rigidbody2D());
                     }
                 }
+
                 if (ImGui.menuItem("Add Box Collider")) {
-                    if (activeGameObject.getComponent(Box2DCollider.class) == null && activeGameObject.getComponent(CircleCollider.class) == null) {
+                    if (activeGameObject.getComponent(Box2DCollider.class) == null &&
+                            activeGameObject.getComponent(CircleCollider.class) == null) {
                         activeGameObject.addComponent(new Box2DCollider());
                     }
                 }
 
                 if (ImGui.menuItem("Add Circle Collider")) {
-                    if (activeGameObject.getComponent(Box2DCollider.class) == null && activeGameObject.getComponent(CircleCollider.class) == null) {
+                    if (activeGameObject.getComponent(CircleCollider.class) == null &&
+                            activeGameObject.getComponent(Box2DCollider.class) == null) {
                         activeGameObject.addComponent(new CircleCollider());
                     }
                 }
 
                 ImGui.endPopup();
-
             }
+
             activeGameObject.imgui();
             ImGui.end();
         }
@@ -75,5 +78,9 @@ public class PropertiesWindow {
 
     public void setActiveGameObject(GameObject go) {
         this.activeGameObject = go;
+    }
+
+    public PickingTexture getPickingTexture() {
+        return this.pickingTexture;
     }
 }

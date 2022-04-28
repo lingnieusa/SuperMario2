@@ -23,8 +23,6 @@ public class ImGuiLayer {
 
     private long glfwWindow;
 
-
-
     // LWJGL3 renderer (SHOULD be initialized)
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
@@ -55,9 +53,8 @@ public class ImGuiLayer {
         io.setIniFilename("imgui.ini"); // We don't want to save .ini file
         io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
         io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+
         io.setBackendPlatformName("imgui_java_impl_glfw");
-
-
 
         // ------------------------------------------------------------
         // GLFW callbacks to handle user input
@@ -108,7 +105,9 @@ public class ImGuiLayer {
         glfwSetScrollCallback(glfwWindow, (w, xOffset, yOffset) -> {
             io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
             io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
-            MouseListener.mouseScrollCallback(w, xOffset, yOffset);
+            if (!io.getWantCaptureMouse() || gameViewWindow.getWantCaptureMouse()) {
+                MouseListener.mouseScrollCallback(w, xOffset, yOffset);
+            }
         });
 
         io.setSetClipboardTextFn(new ImStrConsumer() {
@@ -146,12 +145,10 @@ public class ImGuiLayer {
 
         fontConfig.destroy(); // After all fonts were added we don't need this config more
 
-
-
         // Method initializes LWJGL3 renderer.
         // This method SHOULD be called after you've initialized your ImGui configuration (fonts and so on).
         // ImGui context should be created as well.
-        imGuiGlfw.init(glfwWindow,false);
+        imGuiGlfw.init(glfwWindow, false);
         imGuiGl3.init("#version 330 core");
     }
 
@@ -159,7 +156,6 @@ public class ImGuiLayer {
         startFrame(dt);
 
         // Any Dear ImGui code SHOULD go between ImGui.newFrame()/ImGui.render() methods
-
         setupDockspace();
         currentScene.imgui();
         //ImGui.showDemoWindow();
@@ -167,7 +163,6 @@ public class ImGuiLayer {
         propertiesWindow.update(dt, currentScene);
         propertiesWindow.imgui();
         sceneHeirarchyWindow.imgui();
-
 
         endFrame();
     }
@@ -178,10 +173,11 @@ public class ImGuiLayer {
     }
 
     private void endFrame() {
-        glBindFramebuffer(GL_FRAMEBUFFER,0);
-        glViewport(0,0,Window.getWidth(),Window.getHeight());
-        glClearColor(0,0,0,1);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, Window.getWidth(), Window.getHeight());
+        glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT);
+
         // After Dear ImGui prepared a draw data, we use it in the LWJGL3 renderer.
         // At that moment ImGui will be rendered to the current OpenGL context.
         ImGui.render();
@@ -191,7 +187,6 @@ public class ImGuiLayer {
         ImGui.updatePlatformWindows();
         ImGui.renderPlatformWindowsDefault();
         glfwMakeContextCurrent(backupWindowPtr);
-
     }
 
     // If you want to clean a room after yourself - do it by yourself
@@ -204,10 +199,9 @@ public class ImGuiLayer {
         int windowFlags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
 
         ImGuiViewport mainViewport = ImGui.getMainViewport();
-        ImGui.setNextWindowPos(mainViewport.getWorkPosX(),mainViewport.getWorkPosY());
-        ImGui.setNextWindowSize(mainViewport.getWorkSizeX(),mainViewport.getWorkSizeY());
+        ImGui.setNextWindowPos(mainViewport.getWorkPosX(), mainViewport.getWorkPosY());
+        ImGui.setNextWindowSize(mainViewport.getWorkSizeX(), mainViewport.getWorkSizeY());
         ImGui.setNextWindowViewport(mainViewport.getID());
-
         ImGui.setNextWindowPos(0.0f, 0.0f);
         ImGui.setNextWindowSize(Window.getWidth(), Window.getHeight());
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f);
@@ -225,7 +219,6 @@ public class ImGuiLayer {
         menuBar.imgui();
 
         ImGui.end();
-
     }
 
     public PropertiesWindow getPropertiesWindow() {
